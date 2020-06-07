@@ -2,6 +2,8 @@ package List.ArrayList;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+//import java.util.ArrayList;
 import java.util.Map;
 
 public class ArrayList {
@@ -240,18 +242,285 @@ public class ArrayList {
         return ans;*/
     }
 
+        /*
+题目66：加一
+给定一个由整数组成的非空数组所表示的非负整数，在该数的基础上加一。
+最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+你可以假设除了整数 0 之外，这个整数不会以零开头。
+
+示例1:
+输入: [1,2,3]
+输出: [1,2,4]
+解释: 输入数组表示数字 123。*/
+
+    public static int[] plusOne(int[] digits) {
+        //这样解会超出int/long的范围，不行！！！
+        /*
+        int n = digits.length;
+        int sum = 0;
+        for(int i=0;i<n;i++){
+            sum = digits[i] + sum*10;
+        }
+        System.out.println(Integer.MAX_VALUE);
+        System.out.println(sum);
+        int newSum = sum+1;
+        System.out.println(newSum);
+        if(newSum/new Double(Math.pow(10,n)).intValue()==0){
+            int[] ans = new int[n];
+            for(int i=n-1;i>=0;i--){
+                int tmp = newSum%10;
+                ans[i] = tmp;
+                newSum /= 10;
+            }
+            return ans;
+        }else{
+            int[] ans = new int[n+1];
+            for(int i=n;i>=0;i--){
+                int tmp = newSum%10;
+                ans[i] = tmp;
+                newSum /= 10;
+            }
+            return ans;
+        }
+        */
+        int n = digits.length;
+        int sign = 0;
+        if(digits[n-1]+1==10){
+            sign = 1;
+            digits[n-1] = 0;
+        }else{
+            digits[n-1] += 1;
+            return digits;
+        }
+        for(int i=n-2;i>=0;i--){
+            if(digits[i]+sign!=10){
+                digits[i] += sign;
+                return digits;
+            }else{
+                digits[i] = 0;
+                sign=1;
+            }
+        }
+        int [] ans = new int[n+1];
+        Arrays.fill(ans,0);
+        ans[0]=1;
+        return ans;
+    }
+
+    /*
+题目88：合并两个有序数组
+给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
+说明:
+初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。
+你可以假设 nums1 有足够的空间（空间大小大于或等于 m + n）来保存 nums2 中的元素
+
+示例1:
+输入:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+输出: [1,2,2,3,5,6]
+*/
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        //双指针
+        //假设长度是m+n 不占用额外空间：可申请空间的话很容易
+        /*for(int i=0;i<n;i++){
+            nums1[m+n-1-i]=nums2[i];
+        }
+        System.out.println(Arrays.toString(nums1));
+        int i=0;
+        int j=m+n-1;
+        while(j>=m) {
+            while (i < j) {
+                if (nums1[i] <= nums1[j]) {
+                    i++;
+                } else {
+                    int tmp = nums1[i];
+                    nums1[i] = nums1[j];
+                    nums1[j] = tmp;
+                    i++;
+                }
+            }
+            j--;
+            i=0;
+        }
+        */
+        //nums1空间集中在后面，所以可以从nums1和nums2后面往前选出大的填充到后面往前
+        //思维惯性：从小到大就从小端开始比！！！
+        int len1 = m - 1;
+        int len2 = n - 1;
+        int len = m + n - 1;
+        while(len1 >= 0 && len2 >= 0) {
+            // 注意--符号在后面，表示先进行计算再减1，这种缩写缩短了代码
+            nums1[len--] = nums1[len1] > nums2[len2] ? nums1[len1--] : nums2[len2--];
+        }
+        // 表示将nums2数组从下标0位置开始，拷贝到nums1数组中，从下标0位置开始，长度为len2+1
+        System.arraycopy(nums2, 0, nums1, 0, len2 + 1);
+
+    }
+
+    /*
+题目118：杨辉三角
+给定一个非负整数 numRows，生成杨辉三角的前 numRows 行。
+在杨辉三角中，每个数是它左上方和右上方的数的和。
+
+示例1:
+输入: 5
+输出:
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+*/
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> res = new java.util.ArrayList<>();
+        if (numRows == 0) {
+            return res;
+        }
+        // 如果没有返回则直接设置第一行
+        res.add(new java.util.ArrayList<Integer>());
+        res.get(0).add(1);
+        // 从第二行开始遍历
+        for (int i = 1; i < numRows; i++) {
+            List<Integer> row = new java.util.ArrayList<>();
+            row.add(1);
+            // 内层循环，下标除去0和最后i，首尾位置默认为1
+            for (int j = 1; j < i; j++) {
+                row.add(res.get(i - 1).get(j - 1) + res.get(i - 1).get(j));
+            }
+            row.add(1);
+            res.add(row);
+        }
+        return res;
+    }
+/*
+题目119:杨辉三角2
+给定一个非负索引 k，其中 k ≤ 33，返回杨辉三角的第 k 行。
+
+示例:
+输入: 3
+输出: [1,3,3,1]
+ */
+//大神总结:一种就是用pre变量将要被覆盖的变量存起来，另一种就是倒着进行。另外求组合数的时候，要防止int的溢出。
+    public static List<Integer> getRow(int rowIndex) {
+        //暴力无空间优化:
+        /*
+        List<List<Integer>> t = new java.util.ArrayList<>();
+        t.add(new java.util.ArrayList<Integer>());
+        t.get(0).add(1);
+        for(int i=1;i<=rowIndex;i++){
+            List<Integer> tmp = new java.util.ArrayList<Integer>();
+            tmp.add(1);
+            for(int j=1;j<i;j++){
+                tmp.add(t.get(i-1).get(j-1)+t.get(i-1).get(j));
+            }
+            tmp.add(1);
+            t.add(tmp);
+        }
+        return t.get(rowIndex);*/
+        //O(k)空间复杂度:
+        /*
+        List<Integer> t = new java.util.ArrayList<>();
+        t.add(1);
+        for(int i=1;i<=rowIndex;i++){
+            t.set(0,1);
+            for(int j=i-1;j>0;j--){           //从前往后会覆盖 应该从后往前
+                t.set(j,t.get(j-1)+t.get(j));
+            }
+            t.add(1);
+        }
+        return t;*/
+        //优雅解法（数学公式法）: 杨辉三角其实是组合数
+        List<Integer> ans = new java.util.ArrayList<>();
+        int N = rowIndex;
+        long pre = 1;
+        ans.add(1);
+        for (int k = 1; k <= N; k++) {
+            long cur = pre * (N - k + 1) / k;       //用long防止计算过程中溢出
+            ans.add((int) cur);
+            pre = cur;
+        }
+        return ans;
+
+    }
+
+    /*
+    题目121：买卖股票的最佳时机
+    给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+    如果你最多只允许完成一笔交易（即买入和卖出一支股票一次），设计一个算法来计算你所能获取的最大利润。
+    注意：你不能在买入股票前卖出股票
+
+    示例 1:
+输入: [7,1,5,3,6,4]
+输出: 5
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+
+    示例 2:
+
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+     */
+    public static int maxProfit(int[] prices) {
+        //动态规划:以下计算方法可行，但超出内存限制 优化一下
+        /*
+        int n = prices.length;
+        int[][] ans = new int[n][n];
+        for(int i=0;i<n;i++){
+            ans[i][i]=0;        //当天买入卖出记为收益0
+        }
+        int max = 0;
+        for(int c=1;c<=n-1;c++){
+            for(int i=0;i<n-c;i++){
+                int j=i+c;
+                ans[i][j] = prices[j]-prices[i];
+                if(ans[i][j]>max){
+                    max = ans[i][j];
+                }
+            }
+        }
+        return max;*/
+        //下面的dp无意义，还不如暴力解法节约空间。。。
+        /*
+        if(prices.length==0||prices.length==1){
+            return 0;
+        }
+        int [] dp = new int[prices.length];
+        int max = 0;
+        dp[0] = 0;          //dp[i]表示第i天卖出的最大收益 dp[i] = max{0,p[i]-p[i-1],p[i]-p[i-2]...}
+        for(int i=1;i<prices.length;i++){
+            int tmpMax = 0;
+            for(int j=i-1;j>=0;j--){
+                if(prices[i]-prices[j]>tmpMax){
+                    tmpMax = prices[i]-prices[j];
+                }
+            }
+            if(tmpMax>max){
+                max = tmpMax;
+            }
+        }
+        return max;*/
+        //优雅解法O(n)复杂度：在最低点买进，必定是最优的，所以要保存一直以来的最低价。如此可省略内循环
+        if(prices.length==0||prices.length==1){
+            return 0;
+        }
+        int maxProfit = 0;
+        int minVal = prices[0];
+        for(int i=1;i<prices.length;i++){       //i表示在第i天卖出，买进是i之前价格最低的那天。
+            if(prices[i]-minVal>maxProfit){     //注意一次交易，先买后卖。
+                maxProfit = prices[i]-minVal;
+            }                                   //从后往前递推也可以，保存最高价，然后减去当前prices【i】 和maxProfit比较。
+            minVal = Math.min(minVal,prices[i]);
+        }
+        return maxProfit;
+    }
 
     public static void main(String[] args) {
-        /*
-        int[] nums = {2, 7, 11, 15};
-        int target = 9;
-        int[] answer = twoSum(nums,target);
-        System.out.println(Arrays.toString(answer));
-        */
-
-        int [] nums = {-3,4,-1,2,1,-5};
-        System.out.println(maxSubArray(nums));
-        //System.out.println(Arrays.toString(nums));
+        int[] prices = {7,6,4,3,1};
+        System.out.println(maxProfit(prices));
 
     }
 
