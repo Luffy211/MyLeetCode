@@ -1,10 +1,8 @@
 package List.ArrayList;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 //import java.util.ArrayList;
-import java.util.Map;
+
 
 public class ArrayList {
     /*
@@ -503,6 +501,19 @@ nums2 = [2,5,6],       n = 3
             }
         }
         return max;*/
+        //正确的动态规划:
+        /*
+        if(prices.length==0||prices.length==1){
+            return 0;
+        }
+        int [][] dp = new int[prices.length][2];
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        for(int i=1;i<prices.length;i++){
+            dp[i][0] = Math.max(dp[i-1][0],dp[i-1][1]+prices[i]);
+            dp[i][1] = Math.min(dp[i-1][1],prices[i]);
+        }
+        return dp[prices.length-1][0];*/
         //优雅解法O(n)复杂度：在最低点买进，必定是最优的，所以要保存一直以来的最低价。如此可省略内循环
         if(prices.length==0||prices.length==1){
             return 0;
@@ -517,6 +528,202 @@ nums2 = [2,5,6],       n = 3
         }
         return maxProfit;
     }
+
+    /*
+题目122：买卖股票的最佳时机2
+设计一个算法来计算你所能获取的最大利润。你可以尽可能地完成更多的交易（多次买卖一支股票）。
+
+注意：你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+
+示例 1:
+
+输入: [7,1,5,3,6,4]
+输出: 7
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 3 天（股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     随后，在第 4 天（股票价格 = 3）的时候买入，在第 5 天（股票价格 = 6）的时候卖出, 这笔交易所能获得利润 = 6-3 = 3 。
+
+示例 2:
+输入: [1,2,3,4,5]
+输出: 4
+解释: 在第 1 天（股票价格 = 1）的时候买入，在第 5 天 （股票价格 = 5）的时候卖出, 这笔交易所能获得利润 = 5-1 = 4 。
+     注意你不能在第 1 天和第 2 天接连购买股票，之后再将它们卖出。
+     因为这样属于同时参与了多笔交易，你必须在再次购买前出售掉之前的股票。
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+ */
+    public static int maxProfit2(int[] prices) {
+        //贪心算法:画出折线图之后一目了然
+        int maxProfit = 0;
+        for(int i=1;i<prices.length;i++){
+            if(prices[i]>prices[i-1]){
+                maxProfit += (prices[i]-prices[i-1]);
+            }
+        }
+        //return maxProfit;
+        //动态规划：
+        int [][] dp = new int[prices.length][2];
+        dp[0][0] = 0;
+        dp[0][1] = -prices[0];
+        for(int i=1;i<prices.length;i++){
+            dp[i][0] = Math.max(dp[i-1][0],dp[i-1][1]+prices[i]);
+            dp[i][1] = Math.max(dp[i-1][1],dp[i-1][0]-prices[i]);
+        }
+        return dp[prices.length-1][0];
+    }
+
+    /*
+    题目167：两数之和2
+    给定一个已按照升序排列 的有序数组，找到两个数使得它们相加之和等于目标数。
+
+函数应该返回这两个下标值 index1 和 index2，其中 index1 必须小于 index2。
+
+说明:
+
+返回的下标值（index1 和 index2）不是从零开始的。
+你可以假设每个输入只对应唯一的答案，而且你不可以重复使用相同的元素。
+示例:
+
+输入: numbers = [2, 7, 11, 15], target = 9
+输出: [1,2]
+解释: 2 与 7 之和等于目标数 9 。因此 index1 = 1, index2 = 2 。
+     */
+    public int[] twoSum2(int[] numbers, int target) {
+        //暴力解法两层循环：
+
+        //头尾双指针 O（n）复杂度
+        int i=0;
+        int j=numbers.length-1;
+        while(i<j){
+            if(numbers[i]+numbers[j]==target){
+                int[] ans = {i+1,j+1};
+                return ans;
+            }else if(numbers[i]+numbers[j]<target){
+                i++;
+            }else{
+                j--;
+            }
+        }
+        return null;
+    }
+
+        /*
+    题目169：两数之和2
+给定一个大小为 n 的数组，找到其中的多数元素。多数元素是指在数组中出现次数大于 ⌊ n/2 ⌋ 的元素。
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+示例 1:
+输入: [3,2,3]
+输出: 3
+     */
+        public static int count(int a,int[] nums){
+            int sum=0;
+            for(int i=0;i<nums.length;i++){
+                if(nums[i]==a){
+                    sum++;
+                }
+            }
+            return sum;
+        }
+        public static int findMajor(int[] nums){
+            if(nums.length<=2){
+                return nums[0];
+            }
+            else{
+                int len = nums.length/2;
+                int[] p1 = new int[len];
+                int[] p2 = new int[nums.length-len];
+                System.arraycopy(nums,0,p1,0,len);
+                System.arraycopy(nums,len,p2,0,nums.length-len);
+                int a = findMajor(p1);
+                int b = findMajor(p2);
+                if(a==b){
+                    return a;
+                }else{
+                    if(count(a,nums)>nums.length/2){
+                        return a;
+                    }else{
+                        return b;
+                    }
+                }
+            }
+        }
+        public static int majorityElement(int[] nums) {
+            //利用哈希表 一次遍历
+            Map<Integer,Integer> map = new HashMap<>();
+            int n = nums.length/2;
+            for(int i=0;i<nums.length;i++){
+                if(map.containsKey(nums[i])){
+                    map.put(nums[i],map.get(nums[i])+1);
+                }else{
+                    map.put(nums[i],1);
+                }
+                if(map.get(nums[i])>n){
+                    return nums[i];
+                }
+            }
+            return -1;
+            //也可以先排序 然后计算当前元素的n/2后还是不是当前元素判断:
+
+            //可以使用分治 a若为众数则a必定两半中至少其中一个的众数:
+            //return findMajor(nums);
+
+        }
+
+        /* 题目189：旋转数组
+    给定一个数组，将数组中的元素向右移动 k 个位置，其中 k 是非负数
+
+    示例 1:
+
+输入: [1,2,3,4,5,6,7] 和 k = 3
+输出: [5,6,7,1,2,3,4]
+解释:
+向右旋转 1 步: [7,1,2,3,4,5,6]
+向右旋转 2 步: [6,7,1,2,3,4,5]
+向右旋转 3 步: [5,6,7,1,2,3,4]
+            */
+        public static void rotate(int[] nums, int k) {
+            //求余即可
+            int n = nums.length;
+            int val = k%nums.length;
+            int[] tmp = new int[val];
+            for(int i=0;i<val;i++){
+                tmp[i] = nums[i];
+            }
+            for(int j=nums.length-1;j>=val;j--){
+                nums[(j+val)%nums.length] = nums[j];
+            }
+            for(int i=0;i<val;i++){
+                nums[(i+val)%nums.length] = tmp[i];
+            }
+        }
+        /*
+        题目217：判断是否存在重复元素
+        给定一个整数数组，判断是否存在重复元素。
+        如果任意一值在数组中出现至少两次，函数返回 true 。如果数组中每个元素都不相同，则返回 false 。
+        示例 1:
+        输入: [1,2,3,1]
+        输出: true
+         */
+        public static boolean containsDuplicate(int[] nums) {
+            //哈希表:
+            Map<Integer,Integer> map = new HashMap<>();
+            for(int i=0;i<nums.length;i++){
+                if(map.containsKey(nums[i])){
+                    return true;
+                }
+                map.put(nums[i],1);
+            }
+            return false;
+            /* HashSet
+            Set<Integer> set = new HashSet<>();
+            for (int x: nums) {
+                if (set.contains(x)) return true;
+                set.add(x);
+            }
+            return false;*/
+            //此题也可以先排序 快排最快
+        }
 
     public static void main(String[] args) {
         int[] prices = {7,6,4,3,1};
