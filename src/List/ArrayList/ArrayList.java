@@ -608,7 +608,7 @@ nums2 = [2,5,6],       n = 3
     }
 
         /*
-    题目169：两数之和2
+    题目169：
 给定一个大小为 n 的数组，找到其中的多数元素。多数元素是指在数组中出现次数大于 ⌊ n/2 ⌋ 的元素。
 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
 
@@ -724,6 +724,186 @@ nums2 = [2,5,6],       n = 3
             return false;*/
             //此题也可以先排序 快排最快
         }
+        /*
+        题目217：判断是否存在重复元素2
+        给定一个整数数组和一个整数 k，判断数组中是否存在两个不同的索引 i 和 j，
+        使得 nums [i] = nums [j]，并且 i 和 j 的差的 绝对值 至多为 k。
+
+        示例 1:
+        输入: nums = [1,2,3,1], k = 3
+        输出: true
+         */
+        public static boolean containsNearbyDuplicate(int[] nums, int k) {
+            //暴力解法
+            for(int i=0;i<nums.length;i++){
+                for(int j=i+1;j<nums.length;j++){
+                    if(nums[i]==nums[j]&&j-i<=k){
+                        return true;
+                    }
+                }
+            }
+            //return false;
+            //hashset解决 限定容量k个  遍历数组元素然后插入 如果满k个则移除第一个 如果当前元素已经在其中了说明索引差值小于k
+            if(k<=0){
+                return false;
+            }
+            HashSet<Integer> set = new HashSet<>(k);
+            for(int i=0;i<nums.length;i++){
+                if(set.contains(nums[i])){
+                    return true;
+                }else if(set.size()<k){
+                    set.add(nums[i]);
+                }else{
+                    set.remove(nums[i-k]);
+                    set.add(nums[i]);
+                }
+            }
+            return false;
+        }
+
+    /*
+题目268：缺失数字
+给定一个包含 0, 1, 2, ..., n 中 n 个数的序列，找出 0 .. n 中没有出现在序列中的那个数。
+示例 1:
+输入: [3,0,1]
+输出: 2
+*/
+    public int missingNumber(int[] nums) {
+        //数学方法做，看看与等差数列的和差距多少
+        int max = nums.length;
+        int sum = (1+max)*max/2;
+        int cnt = 0;
+        for(int i=0;i<max;i++){
+            cnt+=nums[i];
+        }
+        int diff = sum-cnt;
+        //return diff;
+        //法2：先排序 逐个看哪两个相邻元素差值是2
+        //法3：hashset  两次遍历
+        //法4：位运算：异或满足结合律 且一个数与0异或运算等于它自己
+        int len = nums.length;
+        int result = len;
+        for(int i=0;i<len;i++)
+        {
+            result ^= i^nums[i];
+        }
+        return result;
+    }
+
+        /*
+题目283：移动0
+给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+示例 1:
+输入: [0,1,0,3,12]
+输出: [1,3,12,0,0]
+*/
+        public static void moveZeroes(int[] nums) {
+            //cnt计数(本质是双指针)--覆盖
+            int cnt = 0;
+            for(int i=0;i<nums.length;i++){
+                if(nums[i]==0){
+                    cnt++;
+                }else{
+                    nums[i-cnt] = nums[i];
+                }
+            }
+            for(int j=nums.length-cnt;j<nums.length;j++){
+                nums[j] = 0;
+            }
+            //标准双指针--交换
+            int i=0,j=0;
+            for(;i<nums.length;i++){
+                if(nums[i]!=0){
+                    int temp = nums[j];
+                    nums[j] = nums[i];
+                    nums[i] = temp;
+                    j++;
+                }
+            }
+        }
+
+    /*
+题目414：第三大的数
+给定一个非空数组，返回此数组中第三大的数。如果不存在，则返回数组中最大的数。要求算法时间复杂度必须是O(n)。
+
+示例 1:
+输入: [3, 2, 1]
+输出: 1
+解释: 第三大的数是 1.
+*/
+
+    public int thirdMax(int[] nums) {
+        //法1：先排序再找 复杂度超过O(n)
+        //法2: 先找最大的 然后找第二大 最后找第三大 理论上是O(3n)  但是要先排除重复 利用hashset
+        //法3：首先去重 然后维持一个长度为3的数组
+        //其实可以优化 不用hashset去重  维护3个元素的数组 然后直接遍历一次 判断当前和前三大相等则continue
+        HashSet<Integer> set = new HashSet<>();
+        for(int i=0;i<nums.length;i++){
+            try {
+                set.add(nums[i]);
+            }catch (Exception e){
+                continue;
+            }
+
+        }
+        int[] ans = {Integer.MIN_VALUE,Integer.MIN_VALUE,Integer.MIN_VALUE};
+        for(Integer i: set){
+            if(i>ans[0]){
+                ans[2] = ans[1];
+                ans[1] = ans[0];
+                ans[0] = i;
+            }else if(i>ans[1]){
+                ans[2] = ans[1];
+                ans[1] = i;
+            }else if(i>ans[2]){
+                ans[2] = i;
+            }
+        }
+        if(set.size()<3){
+            return ans[0];
+        }
+        //return ans[2];
+        //维护一个只有3个元素的TreeSet，如果大于三个元素就就把Set中的最小最小值remove掉。
+        //最后如果Set中元素小于3就返回Set最大值，否则返回最小值。
+        TreeSet<Integer> tree = new TreeSet<>();
+        for(int i=0;i<nums.length;i++){
+            tree.add(nums[i]);
+            if(tree.size()>3){
+                tree.remove(tree.first());          //第一个是最小的
+            }
+        }
+        return tree.size()==3?tree.last():tree.first();
+    }
+
+    /*
+题目448：找到所有数组中消失的数字
+给定一个范围在  1 ≤ a[i] ≤ n ( n = 数组大小 ) 的 整型数组，数组中的元素一些出现了两次，另一些只出现一次。
+找到所有在 [1, n] 范围之间没有出现在数组中的数字。
+您能在不使用额外空间且时间复杂度为O(n)的情况下完成这个任务吗? 你可以假定返回的数组不算在额外空间内。
+
+示例 1:
+输入:
+[4,3,2,7,8,2,3,1]
+输出:
+[5,6]
+*/
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        //方法1：利用一个hashMap 两次遍历  可是这样不就利用额外空间了？
+        List<Integer> ans = new java.util.ArrayList<>();
+        HashMap<Integer,Integer> map = new HashMap<>();
+        for(int i=0;i<nums.length;i++){
+            map.put(nums[i],nums[i]);
+        }
+        for(int i=1;i<=nums.length;i++){
+            if(!map.containsKey(i)){
+                ans.add(i);
+            }
+        }
+        return ans;
+        //方法2（很强！！！）：利用index 和 nums[index]的关系 二者都在1-n范围内
+        //我们只关心是否有出现，而不关心出现了1次还是2次
+
+    }
 
     public static void main(String[] args) {
         int[] prices = {7,6,4,3,1};
