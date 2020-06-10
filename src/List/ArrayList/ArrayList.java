@@ -905,6 +905,318 @@ nums2 = [2,5,6],       n = 3
 
     }
 
+    /*
+题目485：最大连续1的个数
+给定一个二进制数组， 计算其中最大连续1的个数
+
+示例 1:
+输入: [1,1,0,1,1,1]
+输出: 3
+解释: 开头的两位和最后的三位都是连续1，所以最大连续1的个数是 3.
+*/
+    public int findMaxConsecutiveOnes(int[] nums) {
+        //一次遍历
+        int max=0;
+        int tmp=0;
+        for(int i=0;i<nums.length;i++){
+            if(nums[i]==1){
+                tmp++;
+            }else{
+                max = Math.max(max,tmp);
+                tmp = 0;
+            }
+        }
+        //return max;
+        //动态规划 dp[i][0] dp[i][1] 表示到达索引i为止的最大最大连续个数
+        int[][] dp = new int[nums.length][2];
+        dp[0][0] = nums[0]==1?1:0;          //dp[i][0]表示到目前为止累计的最大连续哦
+        dp[0][1] = nums[0]==1?1:0;          //dp[i][0]表示到目前为止 连续1的个数（中断清0）
+        for(int i=1;i<nums.length;i++){
+            dp[i][0] = Math.max(dp[i-1][0],dp[i-1][1]+(nums[i]==1?1:0));
+            dp[i][1] = nums[i]==1?dp[i-1][1]+1:0;
+        }
+        return dp[nums.length-1][0];
+    }
+
+    /*
+题目509：斐波那契数列
+斐波那契数，通常用 F(n) 表示，形成的序列称为斐波那契数列。该数列由 0 和 1 开始，后面的每一项数字都是前面两项数字的和。也就是：
+F(0) = 0,   F(1) = 1
+F(N) = F(N - 1) + F(N - 2), 其中 N > 1.
+给定 N，计算 F(N)。
+
+示例 1:
+输入：2
+输出：1
+解释：F(2) = F(1) + F(0) = 1 + 0 = 1.
+*/
+    public static int compute(int i) {
+        if(i==0){
+            return 0;
+        }else if(i==1){
+            return 1;
+        }else{
+            return compute(i-1)+compute(i-2);
+        }
+    }
+    public int fib(int N) {
+        //动态规划:注意边界条件
+        if(N==0){
+            return 0;
+        }
+        if(N==1){
+            return 1;
+        }
+        int[] ans = new int[N+1];
+        ans[0] = 0;
+        ans[1] = 1;
+        for(int j =2;j<=N;j++){
+            ans[j] = ans[j-1] + ans[j-2];
+        }
+        //return ans[N];
+
+        //递归:
+        return compute(N);
+    }
+
+    /*
+题目532：数组中的K-diff数对
+给定一个整数数组和一个整数 k, 你需要在数组里找到不同的 k-diff 数对。这里将 k-diff 数对定义为一个整数对 (i, j), 其中 i 和 j 都是数组中的数字，且两数之差的绝对值是 k.
+
+示例 1:
+输入: [3, 1, 4, 1, 5], k = 2
+输出: 2
+解释: 数组中有两个 2-diff 数对, (1, 3) 和 (3, 5)。
+尽管数组中有两个1，但我们只应返回不同的数对的数量。
+示例2：
+输入:[1, 2, 3, 4, 5], k = 1
+输出: 4
+解释: 数组中有四个 1-diff 数对, (1, 2), (2, 3), (3, 4) 和 (4, 5)。
+*/
+    public int findPairs(int[] nums, int k) {
+        //暴力解法:
+        /*int ans = 0;
+        Map<Integer,Integer> map = new HashMap<>();     //(a a-k)(a,a+k)  因为对调成(a-k a) (a+k a)视为和前面一致
+                                                        // 通过一个map来筛选掉已经出现的 和为2a-k的算一个  和为2a+k的算一个
+        for(int i=0;i<nums.length-1;i++){
+            int sign = 0;
+            int pre = Integer.MAX_VALUE;
+            for(int j=i+1;j<nums.length;j++){
+                if(Math.abs(nums[i]-nums[j])==k){
+                    if(sign==0){
+                        sign=1;
+                        pre = nums[j];
+                        if(!map.containsKey(nums[i]+nums[j])){
+                            ans++;
+                            map.put(nums[i]+nums[j],1);
+                        }
+                    }else{
+                        if(nums[j]==pre){
+                            continue;
+                        }else{
+                            if(!map.containsKey(nums[i]+nums[j])){
+                                ans++;
+                                map.put(nums[i]+nums[j],1);
+                            }
+                            break;              //跳出内循环 最多有两组
+                        }
+                    }
+                }
+            }
+        }
+        return ans;
+*/
+        //法2：利用hashmap
+        if(k<0){
+            return 0;
+        }
+        Map<Integer,Integer> map = new HashMap<>();
+        if(k==0) {
+            Map<Integer, Integer> repeatMap = new HashMap<>();
+            for (int i = 0; i < nums.length; i++) {
+                if (!map.containsKey(nums[i])) {
+                    map.put(nums[i], nums[i]);
+                }else{
+                    repeatMap.put(nums[i],1);
+                }
+            }
+            return repeatMap.size();
+        }else {
+            int ans = 0;
+            for (int i = 0; i < nums.length; i++) {
+                map.put(nums[i], nums[i]);
+            }
+            Map<Integer, Integer> sumMap = new HashMap<>();
+            for (Integer key : map.keySet()) {                //k=0的时候咋整?
+                int target1 = key - k;
+                int target2 = key + k;
+                if (map.containsKey(target1)) {
+                    if(!sumMap.containsKey(key+target1)) {
+                        sumMap.put(key+target1,1);              //(1,3)和(3,1)一样 避免重复计算
+                        ans++;
+                    }
+                }
+                if (map.containsKey(target2)) {
+                    if(!sumMap.containsKey(key+target2)) {
+                        sumMap.put(key+target2,1);
+                        ans++;
+                    }
+                }
+            }
+            return ans;
+
+            //法3 先排序
+        }
+    }
+
+    /*
+题目561：数组拆分
+给定长度为 2n 的数组, 你的任务是将这些数分成 n 对, 例如 (a1, b1), (a2, b2), ..., (an, bn) ，使得从1 到 n 的 min(ai, bi) 总和最大。
+
+输入: [1,4,3,2]
+输出: 4
+解释: n 等于 2, 最大总和为 4 = min(1, 2) + min(3, 4).
+*/
+    public static void binaryMerge(int[]nums,int l,int mid,int r){
+        int i=l;
+        int j=mid+1;
+        int[] temp = new int[r-l+1];
+        int k=0;
+        while(i<=mid&&j<=r){
+            if(nums[i]<=nums[j]){
+                temp[k++] = nums[i++];
+            }else{
+                temp[k++] = nums[j++];
+            }
+        }
+        if(i>mid){
+            while(j<=r){
+                temp[k++] = nums[j++];
+            }
+        }
+        if(j>r){
+            while(i<=mid){
+                temp[k++] = nums[i++];
+            }
+        }
+        System.arraycopy(temp,0,nums,l,r-l+1);
+    }
+    public static void binarySort(int[]nums,int l,int r){
+        if(r<=l){
+            return;
+        }
+        int mid = (r+l)/2;
+        binarySort(nums,l,mid);
+        binarySort(nums,mid+1,r);
+        binaryMerge(nums,l,mid,r);
+    }
+    public static int arrayPairSum(int[] nums) {
+        //先排序  然后去0 2 4 ... n-1
+        //归并排序
+        int len = nums.length-1;
+        int sum=0;
+        binarySort(nums,0,len);
+        for(int i=0;i<nums.length;i+=2){
+            sum += nums[i];
+        }
+        return sum;
+
+        //法2：官方解法
+    }
+
+    /*
+题目566：重塑矩阵
+在MATLAB中，有一个非常有用的函数 reshape，它可以将一个矩阵重塑为另一个大小不同的新矩阵，但保留其原始数据。
+给出一个由二维数组表示的矩阵，以及两个正整数r和c，分别表示想要的重构的矩阵的行数和列数。
+重构后的矩阵需要将原始矩阵的所有元素以相同的行遍历顺序填充。
+如果具有给定参数的reshape操作是可行且合理的，则输出新的重塑矩阵；否则，输出原始矩阵。
+
+输入:
+nums =
+[[1,2],
+ [3,4]]
+r = 1, c = 4
+输出:
+[[1,2,3,4]]
+解释:
+行遍历nums的结果是 [1,2,3,4]。新的矩阵是 1 * 4 矩阵, 用之前的元素值一行一行填充新矩阵。
+*/
+    public int[][] matrixReshape(int[][] nums, int r, int c) {
+        int v1 = nums.length;
+        int v2 = 0;
+        if(v1>=1) {
+            v2 = nums[0].length;
+        }else{
+            return nums;
+        }
+        if(v1*v2!=r*c){
+            return nums;
+        }                               //以上为边界判断
+        int[][] ans = new int[r][c];
+        for(int i=0;i<v1;i++){
+            for(int j=0;j<v2;j++){
+                int n = i*v2 + j;       //第n个
+                ans[n/c][n%c] = nums[i][j];
+
+            }
+        }
+        return ans;
+    }
+
+    /*
+题目581：最短无序连续子数组
+给定一个整数数组，你需要寻找一个连续的子数组，如果对这个子数组进行升序排序，那么整个数组都会变为升序排序。
+你找到的子数组应是最短的，请输出它的长度。
+
+输入: [2, 6, 4, 8, 10, 9, 15]
+输出: 5
+解释: 你只需要对 [6, 4, 8, 10, 9] 进行升序排序，那么整个表都会变为升序排序。
+*/
+    public int findUnsortedSubarray(int[] nums) {
+        //法1：双指针暴力法O(n^2)
+        //可以使用双指针，判断不在正确位置上的元素 前后双向 i=0 j=len-1  i正确则i++ i不正确则停止进而移动判断j:j在正确位置 则j--
+        // j不在正确位置则返回j-i+1
+        int i=0;
+        int j=nums.length-1;
+        for(;i<nums.length;i++){
+            int sign1 = 0;
+            for(int k=i+1;k<nums.length;k++){
+                if(nums[i]>nums[k]){
+                    sign1 = 1;
+                    break;
+                }
+            }
+            if(sign1==1){
+                break;                          //说明i位置错了
+            }
+        }
+        if(i==nums.length){                     //还是自增1了
+            return 0;
+        }
+        for(;j>i;j--){
+            int sign2 = 0;
+            for(int k=j-1;k>=i;k--){
+                if(nums[j]<nums[k]){
+                    sign2 = 1;
+                    break;
+                }
+            }
+            if(sign2==1){
+                break;                          //说明j位置错了
+            }
+        }
+        return j-i+1;
+        //法2：求出排序数组nums_sorted  然后比较nums和nums_sorted  最大最小两端 分别第一个不同元素的index O(nlogn)+O(n)
+        //法3:利用栈:这个方法背后的想法仍然是选择排序。我们需要找到无序子数组中最小元素和最大元素分别对应的正确位置，来求得我们想要的无序子数组的边界。
+        //为了达到这一目的，此方法中，我们使用 栈栈 。我们从头遍历 numsnums 数组，如果遇到的数字大小一直是升序的，我们就不断把对应的下标压入栈中，
+        // 这么做的目的是因为这些元素在目前都是处于正确的位置上。一旦我们遇到前面的数比后面的数大，也就是 nums[j]nums[j] 比栈顶元素小，我们可以知道 nums[j]nums[j] 一定不在正确的位置上。
+        //为了找到 nums[j]nums[j] 的正确位置，我们不断将栈顶元素弹出，直到栈顶元素比 nums[j]nums[j] 小，我们假设栈顶元素对应的下标为 kk ，那么我们知道 nums[j]nums[j] 的正确位置下标应该是 k + 1k+1 。
+        //我们重复这一过程并遍历完整个数组，这样我们可以找到最小的 kk， 它也是无序子数组的左边界。
+        //类似的，我们逆序遍历一遍 numsnums 数组来找到无序子数组的右边界。这一次我们将降序的元素压入栈中，如果遇到一个升序的元素，我们像上面所述的方法一样不断将栈顶元素弹出，直到找到一个更大的元素，以此找到无序子数组的右边界。
+
+
+    }
+
     public static void main(String[] args) {
         int[] prices = {7,6,4,3,1};
         System.out.println(maxProfit(prices));
