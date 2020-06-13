@@ -182,6 +182,7 @@ public class LinkedList {
 输入: 1->2->6->3->4->5->6, val = 6
 输出: 1->2->3->4->5
 */
+    //两种方法：1.双指针 2.单指针，赋值抹除
     public ListNode removeElements(ListNode head, int val) {
         if(head==null){
             return null;
@@ -200,5 +201,253 @@ public class LinkedList {
         return newHead.next;
     }
 
+        /*
+    206. 反转链表
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
+*/
+        public static void reverse(ListNode front,ListNode head){
+            if(head==null)
+                return;
+            ListNode tmp = head.next;
+            head.next = front.next;
+            front.next = head;
+            reverse(front,tmp);
+        }
+    public ListNode reverseList(ListNode head) {
+        //头插法
+        if(head==null){
+            return head;
+        }
+        ListNode newHead = new ListNode();      //新建一个头指针
+        ListNode front = newHead;
+        /*while(head!=null){
+            ListNode tmp = head.next;
+            head.next = front.next;
+            front.next = head;
+            //front = head;                     无须移动头指针
+            head = tmp;
+        }
+        return newHead.next;*/
+        //递归法：
+        reverse(front,head);
+        return front.next;
+        }
 
+                /*
+    234. 回文链表
+    请判断一个链表是否为回文链表。
+输入: 1->2
+输出: false
+输入: 1->2->2->1
+输出: true
+*/
+    public boolean isPalindrome(ListNode head) {
+        //法1:先计算链表的长度，奇数偶数做个判断；然后使用头插法逆转前半段，然后比较逆转后的前半段和后半段是否都一致O(n)
+        if(head==null||head.next==null)
+            return true;
+        int len=0;
+        ListNode tmp = head;
+        while(tmp!=null){
+            len++;
+            tmp = tmp.next;
+        }
+        int half = len/2;
+        ListNode firstHalf = new ListNode();
+        for(int i=0;i<half;i++){
+            ListNode tmp1 = head.next;
+            head.next = firstHalf.next;
+            firstHalf.next = head;
+            head = tmp1;
+        }
+        if(len%2!=0){
+            head = head.next;       //奇数时再下移一个
+        }
+        ListNode tmp2 = firstHalf.next;
+        while(head!=null){
+            if(tmp2.val!=head.val)
+                return false;
+            head = head.next;
+            tmp2 = tmp2.next;
+        }
+        return true;
+        //法2:头插法逆转整个链表得到新链表  然后从头到尾比较前后链表  需要O(n)空间
+        //法3：使用数组保存链表元素值  也需要O(n)
+    }
+
+                    /*
+    237. 删除链表中的节点
+    请编写一个函数，使其可以删除某个链表中给定的（非末尾）节点，你将只被给定要求被删除的节点。
+现有一个链表 -- head = [4,5,1,9]，它可以表示为:
+输入: head = [4,5,1,9], node = 5
+输出: [4,1,9]
+解释: 给定你链表中值为 5 的第二个节点，那么在调用了你的函数之后，该链表应变为 4 -> 1 -> 9.
+说明:
+链表至少包含两个节点。
+链表中所有节点的值都是唯一的。
+给定的节点为非末尾节点并且一定是链表中的一个有效节点。
+不要从你的函数中返回任何结果。
+*/
+    public void deleteNode(ListNode head,ListNode node) {
+        //方法1:双指针，找到之后使用前指针，指向当前指针节点的下一个
+        if(head==null||head.next==null)         //长度小于2直接返回
+            return;
+        if(node==head)
+            head = head.next;
+        else {
+            ListNode front = head;
+            ListNode current = head.next;
+            while (current!=node&&current!=null){
+                front = front.next;
+                current = current.next;
+            }
+            if(current!=null)           //说明找到了
+                front.next = current.next;
+        }
+    }
+    //方法2：单指针就够，找到之后，将下一节点的值赋予当前节点，当前节点指向下下节点。另一种删除方式
+    public void deleteNode(ListNode node) {
+        node.val = node.next.val;
+        node.next = node.next.next;
+    }
+
+                        /*
+    876. 链表的中间结点
+给定一个带有头结点 head 的非空单链表，返回链表的中间结点。
+如果有两个中间结点，则返回第二个中间结点。
+输入：[1,2,3,4,5]
+输出：此列表中的结点 3 (序列化形式：[3,4,5])
+返回的结点值为 3 。 (测评系统对该结点序列化表述是 [3,4,5])。
+注意，我们返回了一个 ListNode 类型的对象 ans，这样：
+ans.val = 3, ans.next.val = 4, ans.next.next.val = 5, 以及 ans.next.next.next = NULL.
+*/
+    public ListNode middleNode(ListNode head) {
+        //方法1：先遍历出链表的长度 O(n)  再找中间O(n/2)
+        if(head==null)
+            return null;
+        int len = 0;
+        ListNode tmp = head;
+        while(tmp!=null){
+            len++;
+            tmp = tmp.next;
+        }
+        int mid = len/2 + 1;
+        ListNode tmp1 = head;
+        for(int i=0;i<mid-1;i++){
+            tmp1 = tmp1.next;
+        }
+        return tmp1;
+    }
+
+                            /*
+1290. 二进制链表转整数
+给你一个单链表的引用结点 head。链表中每个结点的值不是 0 就是 1。已知此链表是一个整数数字的二进制表示形式。
+请你返回该链表所表示数字的 十进制值 。
+输入：head = [1,0,1]
+输出：5
+解释：二进制数 (101) 转化为十进制数 (5)
+*/
+    public int getDecimalValue(ListNode head) {
+        //方法1：直接计算累加
+        if(head==null)
+            return 0;
+        int sum = 0;
+        ListNode tmp = head;
+        while(tmp!=null){
+            int val = tmp.val;
+            sum = sum*2 + val;
+            tmp = tmp.next;
+        }
+        return sum;
+        //方法2：逆转链表 顺着来累加
+    }
+
+                                /*
+面试题 02.01. 移除重复节点
+
+编写代码，移除未排序链表中的重复节点。保留最开始出现的节点。
+示例1:
+ 输入：[1, 2, 3, 3, 2, 1]
+ 输出：[1, 2, 3]
+*/
+    public ListNode removeDuplicateNodes(ListNode head) {
+        //方法1：先排序
+        //方法2:利用hash
+        if(head==null)
+            return null;
+        HashSet<Integer> set = new HashSet<>();
+        //单指针删除法--末尾节点不好处理:参考如下!!!
+        /*
+        if(head==null)
+            return null;
+        HashSet<Integer> set = new HashSet<>();
+        ListNode tmp = head;
+        set.add(head.val);
+        while(tmp.next!=null) {                     //tmp不是末尾
+            if (set.contains(tmp.next.val)) {
+                    tmp.next = tmp.next.next;
+            } else {
+                set.add(tmp.next.val);
+                tmp = tmp.next;
+            }
+        }
+        return head;*/
+        //双指针删除法
+        ListNode front = head;
+        ListNode tmp = head.next;
+        set.add(head.val);
+        while(tmp!=null){
+            if(set.contains(tmp.val)){      //重复了，则front不动，tmp前移
+                tmp = tmp.next;
+                front.next = tmp;
+            }else{                          //没出现过，则加入hashset  front和tmp一起前移
+                set.add(tmp.val);
+                front = tmp;
+                tmp = tmp.next;
+            }
+        }
+        return head;
+        //冒泡排序的思想: 空间复杂度O(1)!!!
+        /*
+        ListNode p = head;
+        while (p != null) {
+            ListNode q = p;
+            while (q.next != null) {
+                if (q.next.val == p.val)
+                    q.next = q.next.next;
+                else
+                    q = q.next;
+            }
+            p = p.next;
+        }
+        return head;*/
+    }
+
+                                    /*
+面试题 02.02. 返回倒数第 k 个节点
+实现一种算法，找出单向链表中倒数第 k 个节点。返回该节点的值。
+注意：本题相对原题稍作改动
+示例：
+输入： 1->2->3->4->5 和 k = 2
+输出： 4
+*/
+    public int kthToLast(ListNode head, int k) {
+        //方法1：先求出链表长len  然后倒数第k个就是正着数len-k+1个
+        if(head==null)
+            return 0;
+        int len = 0;
+        ListNode tmp = head;
+        while(tmp!=null){
+            len++;
+            tmp = tmp.next;
+        }
+        int sign = len-k+1;
+        ListNode tmp1 = head;
+        for(int i=1;i<sign;i++){
+            tmp1 = tmp1.next;
+        }
+        return tmp1.val;
+        //方法2：利用头插法逆转链表 然后求逆转后的第k个
+
+}
 }
