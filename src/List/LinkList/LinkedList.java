@@ -447,7 +447,7 @@ ans.val = 3, ans.next.val = 4, ans.next.next.val = 5, 以及 ans.next.next.next 
             tmp1 = tmp1.next;
         }
         return tmp1.val;
-        //方法2：利用头插法逆转链表 然后求逆转后的第k个
+        //方法2：利用头插法逆转链表 然后求逆转后的第k个。
 
 }
 }
