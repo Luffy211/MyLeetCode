@@ -87,7 +87,7 @@ class ListNode{
     }
 }
 public class LinkedList {
-    public static ListNode head;            //链表的头结点  不存储数据
+    public  ListNode head;            //链表的头结点  不存储数据
     public static void main(String[] args) {
         /*
         head = new ListNode();
