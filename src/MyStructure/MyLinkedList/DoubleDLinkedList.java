@@ -1,22 +1,20 @@
-package MyStructure;
+package MyStructure.MyLinkedList;
 
-//双端单链表，是单向链表而不是双向链表
-//除了头指针外，还有一个尾指针指向尾节点
-//常用作队列的实现，表尾插入，因为有尾指针所有O（1）即可
-//常用的操作和单链表类似
-public class DoubleLinkedList {
-    class ListNode{
+//双端双链表：双向链表 且有尾指针指向末尾节点
+//头结点的prev为空 尾结点的next为空
+public class DoubleDLinkedList {
+    class DListNode{
         int val;
-        ListNode next;
-        ListNode(int val){
+        DListNode prev;
+        DListNode next;
+        DListNode(int val){
             this.val = val;
         }
         void display(){
             System.out.print(this.val);
         }
     }
-    ListNode head,rear;                     //头和尾两个节点
-
+    DListNode head,rear;                  //头尾两个指针
     //判断链表是否为空
     public boolean isEmpty(){
         return head==null;
@@ -24,26 +22,26 @@ public class DoubleLinkedList {
 
     //头插法插入元素：
     public void insertFirst(int key){
-        ListNode newNode = new ListNode(key);
+        DListNode newNode = new DListNode(key);
         if(head==null) {
             head = newNode;
-            rear = newNode;             //只有一个节点时头尾指向同一个
+            rear = newNode;
             return;
         }
         newNode.next = head;
+        head.prev = newNode;
         head = newNode;
     }
-
     //尾插法插入元素：
-    //常用来实现队列
     public void insertLast(int key){
-        ListNode newNode = new ListNode(key);
+        DListNode newNode = new DListNode(key);
         if(head==null) {
             head = newNode;
             rear = newNode;
             return;
         }
         rear.next = newNode;
-        rear = newNode;
+        newNode.prev = rear;
+        newNode.next = null;
     }
 }

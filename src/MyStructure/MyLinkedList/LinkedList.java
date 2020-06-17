@@ -1,4 +1,4 @@
-package MyStructure;
+package MyStructure.MyLinkedList;
 
 //实现单链表，其中节点类作为单链表类的内部类实现
 //头插法可用于实现栈

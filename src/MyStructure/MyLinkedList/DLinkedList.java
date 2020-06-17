@@ -1,4 +1,4 @@
-package MyStructure;
+package MyStructure.MyLinkedList;
 
 //双向链表 每个节点有prev和next两个指针
 //头结点的prev为null  尾结点的next为null
