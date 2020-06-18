@@ -1,7 +1,5 @@
 package List.StackAndQueue;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class MyStack {
 
@@ -33,11 +31,13 @@ public class MyStack {
             return false;
     }
 
+
+    /*
     class MinStack {
         List<Integer> array;
         int topIndex;
         int minVal;
-        /** initialize your data structure here. */
+
         public MinStack() {
             array = new ArrayList<>();
             this.topIndex = -1;
@@ -79,15 +79,363 @@ public class MyStack {
             return this.minVal;
         }
     }
+*/
+    //利用一个最小栈 优雅解决问题：
+    class MinStack {
+        private Stack<Integer> stack;
+        private Stack<Integer> min_stack;
+        public MinStack() {
+            stack = new Stack<>();
+            min_stack = new Stack<>();
+        }
+        public void push(int x) {
+            stack.push(x);
+            if(min_stack.isEmpty() || x <= min_stack.peek())
+                min_stack.push(x);
+        }
+        public void pop() {
+            if(stack.pop().equals(min_stack.peek()))
+                min_stack.pop();
+        }
+        public int top() {
+            return stack.peek();
+        }
+        public int getMin() {
+            return min_stack.peek();
+        }
+    }
 
-    /**
-     * Your MinStack object will be instantiated and called as such:
-     * MinStack obj = new MinStack();
-     * obj.push(x);
-     * obj.pop();
-     * int param_3 = obj.top();
-     * int param_4 = obj.getMin();
+    /*
+    225.使用队列实现栈
+
+
+    class MyStack {
+        Queue<Integer> q1;
+        Queue<Integer> q2;
+
+        public MyStack() {
+            q1 = new LinkedList<Integer>();
+            q2 = new LinkedList<Integer>();
+        }
+
+        public void push(int x) {
+            if((q1.size()==0&&q2.size()==0)||(q1.size()!=0&&q2.size()==0)){
+                q1.offer(x);
+                return;
+            }
+            if(q1.size()==0&&q2.size()!=0){
+                q2.offer(x);
+                return;
+            }
+        }
+
+        public int pop() {
+            if(q1.size()>0&&q2.size()==0){
+                int len = q1.size();
+                for(int i=0;i<len-1;i++){
+                    q2.offer(q1.poll());
+                }
+                return q1.poll();
+            }
+            if(q1.size()==0&&q2.size()>0){
+                int len = q2.size();
+                for(int i=0;i<len-1;i++){
+                    q1.offer(q2.poll());
+                }
+                return q2.poll();
+            }
+            return 1;
+        }
+
+        public int top() {
+            if(q1.size()>0&&q2.size()==0){
+                int len = q1.size();
+                for(int i=0;i<len-1;i++){
+                    q2.offer(q1.poll());
+                }
+                int tmp =  q1.poll();
+                q2.offer(tmp);
+                return tmp;
+            }
+            if(q1.size()==0&&q2.size()>0){
+                int len = q2.size();
+                for(int i=0;i<len-1;i++){
+                    q1.offer(q2.poll());
+                }
+                int tmp =  q2.poll();
+                q1.offer(tmp);
+                return tmp;
+            }
+            return 0;
+        }
+
+        public boolean empty() {
+            return q1.size()==0&&q2.size()==0;
+        }
+    }
+    */
+
+    /*232.使用栈实现队列*/
+    class MyQueue {
+        Stack<Integer> s1;
+        Stack<Integer> s2;
+
+        /** Initialize your data structure here. */
+        public MyQueue() {
+            s1 = new Stack<Integer>();
+            s2 = new Stack<Integer>();
+        }
+
+        /** Push element x to the back of queue. */
+        public void push(int x) {
+            if((s1.empty()&&s2.empty())||(!s1.empty()&&s2.empty())){
+                s1.push(x);
+            }
+            if(s1.empty()&&!s2.empty()) {
+                int len = s2.size();
+                for (int i = 0; i < len; i++) {
+                    s1.push(s2.pop());
+                }
+                s1.push(x);
+            }
+        }
+
+        /** Removes the element from in front of queue and returns that element. */
+        public int pop() {
+            if(!s1.empty()){
+                int len = s1.size();
+                for(int i=0;i<len-1;i++){
+                    s2.push(s1.pop());
+                }
+                return s1.pop();
+            }
+            if(!s2.empty()){
+                return s2.pop();
+            }
+            return 0;                   //假定了非空，此处不会执行
+        }
+
+        /** Get the front element. */
+        public int peek() {
+            if(!s1.empty()){
+                int len = s1.size();
+                for(int i=0;i<len-1;i++){
+                    s2.push(s1.pop());
+                }
+                int tmp =  s1.pop();
+                s2.push(tmp);
+                return tmp;
+            }
+            if(!s2.empty()){
+                return s2.peek();
+            }
+            return 0;                   //假定了非空，此处不会执行
+        }
+
+        /** Returns whether the queue is empty. */
+        public boolean empty() {
+            return s1.empty()&&s2.empty();
+        }
+    }
+
+    /*496.下一个更大元素i
+    给定两个 没有重复元素 的数组 nums1 和 nums2 ，其中nums1 是 nums2 的子集。找到 nums1 中每个元素在 nums2 中的下一个比其大的值。
+    nums1 中数字 x 的下一个更大元素是指 x 在 nums2 中对应位置的右边的第一个比 x 大的元素。如果不存在，对应位置输出 -1 。
+
+    输入: nums1 = [4,1,2], nums2 = [1,3,4,2].
+    输出: [-1,3,-1]
+    解释:
+    对于num1中的数字4，你无法在第二个数组中找到下一个更大的数字，因此输出 -1。
+    对于num1中的数字1，第二个数组中数字1右边的下一个较大数字是 3。
+    对于num1中的数字2，第二个数组中没有下一个更大的数字，因此输出 -1。
+
+    输入: nums1 = [2,4], nums2 = [1,2,3,4].
+    输出: [3,-1]
+    解释:
+   对于 num1 中的数字 2 ，第二个数组中的下一个较大数字是 3 。
+    对于 num1 中的数字 4 ，第二个数组中没有下一个更大的数字，因此输出 -1 。
      */
+    public int[] nextGreaterElement(int[] nums1, int[] nums2) {
+        //暴力法：两层循环 O(n^2)
+        /*
+        int[] res = new int[nums1.length];
+        for(int i=0;i<nums1.length;i++){
+            int sign = 0;
+            int chg = 0;
+            for(int j=0;j<nums2.length;j++){
+                if(nums1[i]==nums2[j]){
+                    sign = 1;
+                }
+                if(nums1[i]<nums2[j]&&sign==1){
+                    res[i] = nums2[j];
+                    chg = 1;
+                    break;
+                }
+            }
+            if(chg==0){
+                res[i] = -1;
+            }
+        }
+        return res;*/
+        //使用栈解决:维护一个单调栈
+        Stack<Integer> s = new Stack<>();
+        Map<Integer,Integer> map = new HashMap<>();
+        for(int i =0;i<nums2.length;i++){
+            if(s.empty()||nums2[i]<s.peek()){
+                s.push(nums2[i]);
+            }else{
+                while(!s.empty()&&nums2[i]>s.peek()) {
+                    map.put(s.pop(), nums2[i]);
+                }
+                s.push(nums2[i]);
+            }
+        }
+        while(!s.empty()){
+            map.put(s.pop(), -1);
+        }
+        int[] res = new int[nums1.length];
+        for(int j=0;j<nums1.length;j++){
+            res[j] = map.get(nums1[j]);
+        }
+        return res;
+
+        //方法3:不使用栈 利用hashmap 先从后往前遍历nums2 找出每个元素的对应值
+    }
+
+    /*
+    682.棒球比赛:
+    你现在是棒球比赛记录员。
+    给定一个字符串列表，每个字符串可以是以下四种类型之一：
+1.整数（一轮的得分）：直接表示您在本轮中获得的积分数。
+2. "+"（一轮的得分）：表示本轮获得的得分是前两轮有效 回合得分的总和。
+3. "D"（一轮的得分）：表示本轮获得的得分是前一轮有效 回合得分的两倍。
+4. "C"（一个操作，这不是一个回合的分数）：表示您获得的最后一个有效 回合的分数是无效的，应该被移除。
+每一轮的操作都是永久性的，可能会对前一轮和后一轮产生影响。
+你需要返回你在所有回合中得分的总和。
+     */
+    public int calPoints(String[] ops) {
+        Stack<Integer> s = new Stack<>();
+        for(String op : ops){
+            if(op.equals("+")){
+                int num1 = s.pop();
+                int num2 = s.peek();
+                s.push(num1);
+                s.push(num1+ num2);
+                continue;
+            }
+            if(op.equals("C")){
+                s.pop();
+                continue;
+            }
+            if(op.equals("D")){
+                int num = s.peek();
+                s.push(2*num);
+                continue;
+            }
+            s.push(Integer.parseInt(op));
+        }
+        int res = 0;
+        while(!s.empty()){
+            res+=s.pop();
+        }
+        return res;
+    }
+    /*
+    844. 比较含退格的字符串
+    给定 S 和 T 两个字符串，当它们分别被输入到空白的文本编辑器后，判断二者是否相等，并返回结果。 # 代表退格字符。
+    注意：如果对空文本输入退格字符，文本继续为空。
+     */
+    public boolean backspaceCompare(String S, String T) {
+        Stack<Character> s1 = new Stack<>();
+        Stack<Character> s2 = new Stack<>();
+        char[] str1 = S.toCharArray();
+        char[] str2 = T.toCharArray();
+        for(char x: str1){
+            if(x=='#'){
+                if(!s1.empty())
+                    s1.pop();
+            }else{
+                s1.push(x);
+            }
+        }
+        for(char x: str2){
+            if(x=='#'){
+                if(!s2.empty())
+                    s2.pop();
+            }else{
+                s2.push(x);
+            }
+        }
+        if(s1.size()!=s2.size())
+            return false;
+        int len = s1.size();
+        for(int i=0;i<len;i++){
+            if(s1.pop()!=s2.pop())
+                return false;
+        }
+        return true;
+    }
+
+    /*
+    1021. 删除最外层的括号
+    有效括号字符串为空 ("")、"(" + A + ")" 或 A + B，其中 A 和 B 都是有效的括号字符串，+ 代表字符串的连接。例如，""，"()"，"(())()" 和 "(()(()))" 都是有效的括号字符串。
+    如果有效字符串 S 非空，且不存在将其拆分为 S = A+B 的方法，我们称其为原语（primitive），其中 A 和 B 都是非空有效括号字符串。
+    给出一个非空有效字符串 S，考虑将其进行原语化分解，使得：S = P_1 + P_2 + ... + P_k，其中 P_i 是有效括号字符串原语。
+    对 S 进行原语化分解，删除分解中每个原语字符串的最外层括号，返回 S 。
+     */
+    public String removeOuterParentheses(String S) {
+        if(S.equals(""))
+            return "";
+        Stack<Character>s = new Stack<>();
+        char[] str = S.toCharArray();
+        String res = "";
+        int len = str.length;
+        s.push(str[0]);
+        int lSign = 0;
+        int rSign = 0;
+        for(int i=1;i<len;i++){
+            if(str[i]=='(')
+                s.push(str[i]);
+            else{
+                s.pop();
+            }
+            if(s.empty()) {
+                rSign = i;
+                res += new String(Arrays.copyOfRange(str,lSign+1,rSign));
+                lSign = i+1;
+            }
+        }
+        return res;
+        //优雅实现:
+        /*
+        StringBuilder sb = new StringBuilder();
+        int level = 0;
+        for (char c : S.toCharArray()) {
+            if (c == ')') --level;
+            if (level >= 1) sb.append(c);
+            if (c == '(') ++level;
+        }
+        return sb.toString();*/
+
+        /*
+        StringBuilder sb=new StringBuilder();
+        int mark=-1;
+        for(int i=0;i<S.length();i++){
+            char c=S.charAt(i);
+            if(c=='('){
+                mark++;
+            }
+            if(c==')'){
+                mark--;
+            }
+             if(mark==0&&c=='('||mark==-1&&c==')'){
+                continue;
+            }
+            sb.append(c);
+        }
+        return sb.toString();
+         */
+    }
 
     public static void main(String[] args) {
         String s = "()";
