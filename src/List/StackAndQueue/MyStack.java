@@ -437,6 +437,117 @@ public class MyStack {
          */
     }
 
+        /*
+    1047. 删除字符串中的所有相邻重复项
+给出由小写字母组成的字符串 S，重复项删除操作会选择两个相邻且相同的字母，并删除它们。
+在 S 上反复执行重复项删除操作，直到无法继续删除。
+在完成所有重复项删除操作后返回最终的字符串。答案保证唯一。
+    输入："abbaca"
+输出："ca"
+解释：
+例如，在 "abbaca" 中，我们可以删除 "bb" 由于两字母相邻且相同，这是此时唯一可以执行删除操作的重复项。之后我们得到字符串 "aaca"，其中又只有 "aa" 可以执行重复项删除操作，所以最后的字符串为 "ca"。
+     */
+        public String removeDuplicates(String S) {
+            //方法1：使用栈
+            /*
+            if(S.length()<=1)
+                return S;
+            Stack<Character>stack = new Stack<>();
+            for(int i=0;i<S.length();i++){
+                if(stack.empty()){
+                    stack.push(S.charAt(i));
+                }else{
+                    if(stack.peek()==S.charAt(i)){
+                        stack.pop();
+                    }else{
+                        stack.push(S.charAt(i));
+                    }
+                }
+            }
+            if(stack.empty())
+                return "";
+            char[] res = new char[stack.size()];        //注意这个操作
+            for(int i=res.length-1;i>=0;i--){
+                res[i] = stack.pop();
+            }
+            return new String(res);*/
+            //方法2:利用辅助数组 双指针遍历S
+            int[] sup = new int[S.length()];        //sup[i]==0 表示第i个字符要保留 sup[i]==-1表示舍弃
+            int l = 0;          //慢指针
+            for(int r=1;r<S.length();){
+                if(S.charAt(l)==S.charAt(r)){
+                    sup[l] = -1;
+                    sup[r] = -1;
+                    int sign = 0;
+                    for(int k=l-1;k>=0;k--){
+                        if(sup[k]!=-1){
+                            l = k;
+                            sign = 1;
+                            break;
+                        }
+                    }
+                    if(sign==0){            //说明往前皆为-1
+                        l = r+1;
+                        r = r+2;
+                    }else{
+                        r++;
+                    }
+                }else{
+                    //找到下一个sup值不为-1的位置
+                    for(int k=l+1;k<=r;k++){
+                        if(sup[k]!=-1) {
+                            l = k;
+                            break;
+                        }
+                    }
+                    r++;
+                }
+            }
+            StringBuilder ss = new StringBuilder();
+            for(int i =0;i<sup.length;i++){
+                if(sup[i]!=-1){
+                    ss.append(S.charAt(i));
+                }
+            }
+            return ss.toString();
+            //方法3：使用递归
+        }
+        /*
+1441. 用栈操作构建数组
+给你一个目标数组 target 和一个整数 n。每次迭代，需要从  list = {1,2,3..., n} 中依序读取一个数字。
+请使用下述操作来构建目标数组 target ：
+Push：从 list 中读取一个新元素， 并将其推入数组中。
+Pop：删除数组中的最后一个元素。
+如果目标数组构建完成，就停止读取更多元素。
+题目数据保证目标数组严格递增，并且只包含 1 到 n 之间的数字。
+请返回构建目标数组所用的操作序列。
+题目数据保证答案是唯一的。
+
+输入：target = [1,3], n = 3
+输出：["Push","Push","Pop","Push"]
+解释：
+读取 1 并自动推入数组 -> [1]
+读取 2 并自动推入数组，然后删除它 -> [1]
+读取 3 并自动推入数组 -> [1,3]
+
+   */
+        public List<String> buildArray(int[] target, int n) {
+            List<String>res = new ArrayList<>();
+            for(int i=0;i<target[0]-1;i++){
+                res.add("Push");
+                res.add("Pop");
+            }
+            res.add("Push");
+            for(int i=1;i<target.length;i++){
+                int tmp = target[i] - target[i-1];
+                for(int j=0;j<tmp-1;j++){
+                    res.add("Push");
+                    res.add("Pop");
+                }
+                res.add("Push");
+            }
+            return res;
+        }
     public static void main(String[] args) {
         String s = "()";
         //System.out.println(isValid(s));
