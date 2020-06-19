@@ -548,6 +548,36 @@ Pop：删除数组中的最后一个元素。
             }
             return res;
         }
+    /*
+面试题59 - I. 滑动窗口的最大值
+给定一个数组 nums 和滑动窗口的大小 k，请找出所有滑动窗口里的最大值。
+示例:
+输入: nums = [1,3,-1,-3,5,3,6,7], 和 k = 3
+输出: [3,3,5,5,6,7]
+解释:
+
+*/
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        //暴力法：先计算出有效窗口数 并建立数组 然后遍历每个窗口求窗口的最大值
+        if(nums.length==0)
+            return nums;
+        int len = nums.length;
+        int newLen = len-k+1;
+        int [] ans = new int[newLen];
+        for(int i=0;i<newLen;i++){
+            int max = Integer.MIN_VALUE;
+            for(int j=i;j<i+k;j++){
+                if(nums[j]>max){
+                    max = nums[j];
+                }
+            }
+            ans[i] = max;
+        }
+        return ans;
+        //使用栈：
+
+    }
+
     public static void main(String[] args) {
         String s = "()";
         //System.out.println(isValid(s));
