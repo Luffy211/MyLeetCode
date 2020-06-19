@@ -557,9 +557,10 @@ Pop：删除数组中的最后一个元素。
 解释:
 
 */
-    public int[] maxSlidingWindow(int[] nums, int k) {
+    public static int[] maxSlidingWindow(int[] nums, int k) {
         //暴力法：先计算出有效窗口数 并建立数组 然后遍历每个窗口求窗口的最大值
-        if(nums.length==0)
+
+        /*if(nums.length==0)
             return nums;
         int len = nums.length;
         int newLen = len-k+1;
@@ -573,9 +574,50 @@ Pop：删除数组中的最后一个元素。
             }
             ans[i] = max;
         }
-        return ans;
-        //使用栈：
+        return ans;*/
+        //使用队列：一个非严格递减队列q  q的长度最多为窗口大小k
+        //窗口滑动时q有两个操作：1.q满3个，则移除左端，右端加入新的元素(判断是否递减，将q中小于新元素的元素出队列)
+        //2.不满3个，则不用移除左端元素，右端加入新的元素(判断是否递减，将q中小于新元素的元素出队列)
+        //每个窗口的最大元素，即为q的队首元素（最左端）
+        //双指针i j;j-i+1 == k;令j的范围为[0,nums.length-1]
+        if(nums.length==0)
+            return nums;
+        int len = nums.length;
+        int newLen = len-k+1;
+        int [] ans = new int[newLen];
+        Deque<Integer> q = new LinkedList<>();
+        for(int j=0;j<len;j++){
+            int i = j-k;
+            if(!q.isEmpty()){
+                if(q.size()==k||(i>=0&&nums[i]==q.getFirst())) {
+                    q.removeFirst();
+                }
+                while(!q.isEmpty()&&q.getLast()<nums[j]){              //像这种条件，要把非空判断放在前头
+                    q.removeLast();                                     //从后往前比较 因为是递减队列
+                }
 
+                q.addLast(nums[j]);
+            }else{
+                q.addLast(nums[j]);
+            }
+            if(j-k+1>=0){
+                ans[j-k+1] = q.getFirst();
+            }
+        }
+        return ans;
+        //优雅实现:
+        /*
+        if(nums.length == 0 || k == 0) return new int[0];
+        Deque<Integer> deque = new LinkedList<>();
+        int[] res = new int[nums.length - k + 1];
+        for(int j = 0, i = 1 - k; j < nums.length; i++, j++) {
+            if(i > 0 && deque.peekFirst() == nums[i - 1]) deque.removeFirst(); // 删除 deque 中对应的 nums[i-1]
+            while(!deque.isEmpty() && deque.peekLast() < nums[j]) deque.removeLast(); // 保持 deque 递减
+            deque.addLast(nums[j]);
+            if(i >= 0) res[i] = deque.peekFirst();  // 记录窗口最大值
+        }
+        return res;
+        */
     }
 
     public static void main(String[] args) {
@@ -586,5 +628,7 @@ Pop：删除数组中的最后一个元素。
         list.add(1,3);
         System.out.println(list.get(0));
 
+        int[] nums = {1,3,1,2,0,5};
+        System.out.println(Arrays.toString(maxSlidingWindow(nums,3)));
     }
 }
