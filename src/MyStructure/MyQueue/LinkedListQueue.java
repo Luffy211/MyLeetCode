@@ -19,6 +19,7 @@ public class LinkedListQueue {
     LinkedListQueue(){
         this.head=null;
         this.rear=null;
+
     }
     //判断是否为空
     public boolean isEmpty(){
