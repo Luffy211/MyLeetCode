@@ -22,8 +22,21 @@ I 可以放在 V (5) 和 X (10) 的左边，来表示 4 和 9。
 X 可以放在 L (50) 和 C (100) 的左边，来表示 40 和 90。 
 C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
      */
+    public static int getValue(char c){
+        switch (c) {
+            case 'I':   return 1;
+            case 'V':   return 5;
+            case 'X':   return 10;
+            case 'L':   return 50;
+            case 'C':   return 100;
+            case 'D':   return 500;
+            case 'M':   return 1000;
+            default:    return 0;
+        }
+    }
     public int romanToInt(String s) {
         //解法1：利用hashmap，速度较慢
+        /*
         if(s.equals("")||s==null)
             return 0;
         HashMap<Character,Integer>valueMap = new HashMap<>();
@@ -57,9 +70,10 @@ C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
                 res += valueMap.get(c);
             }
         }
-        return res;
+        return res;*/
         //解法2:直接从左到右遍历，当前比下一位小，则当前要用来减。
         //使用switch返回value，比hashmap快很多
-
+        if(s.equals("")||s==null)
+            return 0;
     }
 }
